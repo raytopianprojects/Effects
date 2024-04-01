@@ -140,7 +140,7 @@ uniform struct p3d_FogParameters {
   float end;
   float scale; // 1.0 / (end - start)
 } p3d_Fog;
-""".replace("light_max", light_max).replace("max_joints", max_joints).replace("max_clip_planes", max_clip_planes)]
+""".replace("light_max", str(light_max)).replace("max_joints", str(max_joints)).replace("max_clip_planes", str(max_clip_planes))]
         self.vertex_attributes = ["""// The position, normal vector and color of the currently processed vertex.
 in vec4 p3d_Vertex;
 in vec3 p3d_Normal;
