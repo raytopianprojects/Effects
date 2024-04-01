@@ -44,3 +44,7 @@ for value in range(3):
 s.run()
 
 ```
+
+The results of this example should look like this:
+![image](https://github.com/raytopianprojects/Effects/assets/54505044/a9844204-db2b-4045-a4a0-62a388590e59)
+
