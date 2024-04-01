@@ -2,7 +2,7 @@ from panda3d.core import Shader
 
 
 class Effect:
-    def __init__(self, version="#version 150"):
+    def __init__(self, version="#version 150", light_max=32, max_joints=16, max_clip_planes=4):
         self.fragment_attributes = []
         self.tess_2_attributes = []
         self.tess_1_attributes = []
@@ -82,7 +82,7 @@ uniform struct p3d_LightModelParameters {
 
 // Active clip planes, in apiview space.  If there is no clip plane for a given
 // index, it is guaranteed to contain vec4(0, 0, 0, 0).
-uniform vec4 p3d_ClipPlane[4];
+uniform vec4 p3d_ClipPlane[max_clip_planes];
 
 // Reports the frame time of the current frame, for animations.
 uniform float osg_FrameTime;
@@ -93,7 +93,7 @@ uniform int osg_FrameNumber;
 
 // If hardware skinning is enabled, this contains the transform of each joint.
 // Superfluous array entries will contain the identity matrix.
-uniform mat4 p3d_TransformTable[16];
+uniform mat4 p3d_TransformTable[max_joints];
 
 // New in 1.10.  Contains information for each non-ambient light.
 // May also be used to access a light passed as a shader input.
@@ -130,7 +130,7 @@ uniform struct p3d_LightSourceParameters {
 
   // Transforms view-space coordinates to shadow map coordinates
   mat4 shadowViewMatrix;
-} p3d_LightSource[32];
+} p3d_LightSource[light_max];
 
 // New in 1.10.  Contains fog state.
 uniform struct p3d_FogParameters {
@@ -140,7 +140,7 @@ uniform struct p3d_FogParameters {
   float end;
   float scale; // 1.0 / (end - start)
 } p3d_Fog;
-"""]
+""".replace("light_max", light_max).replace("max_joints", max_joints).replace("max_clip_planes", max_clip_planes)]
         self.vertex_attributes = ["""// The position, normal vector and color of the currently processed vertex.
 in vec4 p3d_Vertex;
 in vec3 p3d_Normal;
@@ -329,7 +329,10 @@ if __name__ == "__main__":
   p3d_FragColor = color.bgra;
 """,
                 "vertex_attributes": "out vec2 texcoord;",
-                "fragment_attributes": "in vec2 texcoord;"}, {"vertex": "texcoord *= 2;", "fragment": "p3d_FragColor -= 0.3;"}]
+                "fragment_attributes": "in vec2 texcoord;"},
+
+               {"vertex": "texcoord *= 2;",
+                "fragment": "p3d_FragColor.b -= 0.3;"}]
     e = Effect()
     for shader in shaders:
         e.add_layer(**shader)
