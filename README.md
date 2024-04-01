@@ -5,6 +5,7 @@ To use just download effects.py. No additional dependencies needed.
 Example
 
 ```
+python
   from direct.showbase.ShowBase import ShowBase
 
     s = ShowBase()
