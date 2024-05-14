@@ -31,6 +31,9 @@ shaders = [
         "fragment": "p3d_FragColor.b -= 0.3;"
     }
 ]
+
+from effects import Effect
+
 e = Effect()
 for shader in shaders:
     e.add_layer(**shader)
