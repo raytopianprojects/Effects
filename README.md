@@ -11,25 +11,25 @@ s = ShowBase()
 
 shaders = [
 {
-"vertex":
-"""
-gl_Position = p3d_ModelViewProjectionMatrix * p3d_Vertex;
-texcoord = p3d_MultiTexCoord0;
-""",
+    "vertex":
+        """
+        gl_Position = p3d_ModelViewProjectionMatrix * p3d_Vertex;
+        texcoord = p3d_MultiTexCoord0;
+        """,
 
-"fragment":
-"""
-vec4 color = texture(p3d_Texture0, texcoord);
-p3d_FragColor = color.bgra;
-""",
+    "fragment":
+        """
+        vec4 color = texture(p3d_Texture0, texcoord);
+        p3d_FragColor = color.bgra;
+        """,
 
-"vertex_attributes": "out vec2 texcoord;",
-"fragment_attributes": "in vec2 texcoord;"
-},
-{
-"vertex": "texcoord *= 2;",
-"fragment": "p3d_FragColor.b -= 0.3;"
-}
+    "vertex_attributes": "out vec2 texcoord;",
+    "fragment_attributes": "in vec2 texcoord;"
+    },
+    {
+        "vertex": "texcoord *= 2;",
+        "fragment": "p3d_FragColor.b -= 0.3;"
+    }
 ]
 e = Effect()
 for shader in shaders:
