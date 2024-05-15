@@ -2,7 +2,7 @@ from panda3d.core import Shader
 
 
 class Effect:
-    def __init__(self, version="#version 150", light_max=32, max_joints=16, max_clip_planes=4):
+    def __init__(self, version="#version 150", light_max=32, max_joints=64, max_clip_planes=4):
         self.fragment_attributes = []
         self.tess_eval_attributes = []
         self.tess_control_attributes = []
