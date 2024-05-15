@@ -4,15 +4,15 @@ from panda3d.core import Shader
 class Effect:
     def __init__(self, version="#version 150", light_max=32, max_joints=16, max_clip_planes=4):
         self.fragment_attributes = []
-        self.tess_2_attributes = []
-        self.tess_1_attributes = []
+        self.tess_eval_attributes = []
+        self.tess_control_attributes = []
         self.geometry_attributes = []
         self.version = version
         self.vertex = []
         self.fragment = []
         self.geometry = []
-        self.tess_1 = []
-        self.tess_2 = []
+        self.tess_control = []
+        self.tess_eval = []
         self.uniforms = ["""// This is probably the most important uniform, transforming a model-space
 // coordinate into a clip-space (ie. relative to the window) coordinate.  This
 // is usually used in the vertex shader to transform p3d_Vertex and store the
@@ -179,10 +179,10 @@ in uvec4 transform_index;"""]
                   fragment=None,
                   geometry_attributes=None,
                   geometry=None,
-                  tess_1_attributes=None,
-                  tess_1=None,
-                  tess_2_attributes=None,
-                  tess_2=None,
+                  tess_control_attributes=None,
+                  tess_control=None,
+                  tess_eval_attributes=None,
+                  tess_eval=None,
                   order=None):
         if uniforms:
             self.uniforms.append(uniforms)
@@ -208,20 +208,20 @@ in uvec4 transform_index;"""]
                 self.geometry.insert(order, geometry)
             else:
                 self.geometry.append(geometry)
-        if tess_1_attributes:
-            self.tess_1_attributes.append(tess_1_attributes)
-        if tess_1:
+        if tess_control_attributes:
+            self.tess_control_attributes.append(tess_control_attributes)
+        if tess_control:
             if order:
-                self.tess_1.insert(order, tess_1)
+                self.tess_control.insert(order, tess_control)
             else:
-                self.tess_1.append(tess_1)
-        if tess_2_attributes:
-            self.tess_2_attributes.append(tess_2_attributes)
-        if tess_2:
+                self.tess_control.append(tess_control)
+        if tess_eval_attributes:
+            self.tess_eval_attributes.append(tess_eval_attributes)
+        if tess_eval:
             if order:
-                self.tess_2.insert(order, tess_2)
+                self.tess_eval.insert(order, tess_eval)
             else:
-                self.tess_2.append(tess_2)
+                self.tess_eval.append(tess_eval)
 
         self.create_shader()
 
@@ -233,10 +233,10 @@ in uvec4 transform_index;"""]
                      fragment=None,
                      geometry_attributes=None,
                      geometry=None,
-                     tess_1_attributes=None,
-                     tess_1=None,
-                     tess_2_attributes=None,
-                     tess_2=None):
+                     tess_control_attributes=None,
+                     tess_control=None,
+                     tess_eval_attributes=None,
+                     tess_eval=None):
         for layer in layers:
             if uniforms:
                 del self.uniforms[layer]
@@ -254,22 +254,22 @@ in uvec4 transform_index;"""]
 
             if geometry:
                 del self.geometry[layer]
-            if tess_1_attributes:
-                del self.tess_1_attributes[layer]
+            if tess_control_attributes:
+                del self.tess_control_attributes[layer]
 
-            if tess_1:
-                del self.tess_1[layer]
-            if tess_2_attributes:
-                del self.tess_2_attributes[layer]
+            if tess_control:
+                del self.tess_control[layer]
+            if tess_eval_attributes:
+                del self.tess_eval_attributes[layer]
 
-            if tess_2:
-                del self.tess_2[layer]
+            if tess_eval:
+                del self.tess_eval[layer]
         self.create_shader()
 
     def create_shader(self):
         vertex = "\n".join(self.vertex_attributes) + "\nvoid main(){"
-        tess_1 = "\nvoid main(){"
-        tess_2 = "\nvoid main(){"
+        tess_control = "\nvoid main(){"
+        tess_eval = "\nvoid main(){"
         geometry = "\nvoid main(){"
         fragment = "\nvoid main(){"
         uniforms = "\n".join(self.uniforms)
@@ -291,24 +291,24 @@ in uvec4 transform_index;"""]
         else:
             geometry = ""
 
-        if self.tess_1:
-            tess_1 += "\n".join(self.tess_1)
-            tess_1 = self.version + uniforms + "\n".join(self.tess_1_attributes) + tess_1 + "}"
+        if self.tess_control:
+            tess_control += "\n".join(self.tess_control)
+            tess_control = self.version + uniforms + "\n".join(self.tess_control_attributes) + tess_control + "}"
         else:
-            tess_1 = ""
+            tess_control = ""
 
-        if self.tess_2:
-            tess_2 += "\n".join(self.tess_2)
-            tess_2 = self.version + uniforms + "\n".join(self.tess_2_attributes) + tess_2 + "}"
+        if self.tess_eval:
+            tess_eval += "\n".join(self.tess_eval)
+            tess_eval = self.version + uniforms + "\n".join(self.tess_eval_attributes) + tess_eval + "}"
         else:
-            tess_2 = ""
-        print("vertex\n", vertex, "\nfragment\n", fragment, "\nGeometry\n", geometry, "\ntess1\n", tess_1, "\ntess2\n", tess_2)
+            tess_eval = ""
+        print("vertex\n", vertex, "\nfragment\n", fragment, "\nGeometry\n", geometry, "\ntess1\n", tess_control, "\ntess2\n", tess_eval)
         self.shader = Shader.make(Shader.SL_GLSL,
                                   vertex=vertex,
                                   fragment=fragment,
                                   geometry=geometry,
-                                  tess_control=tess_1,
-                                  tess_evaluation=tess_2)
+                                  tess_control=tess_control,
+                                  tess_evaluation=tess_eval)
 
     def apply_effect(self, nodepath):
         nodepath.set_shader(self.shader)
